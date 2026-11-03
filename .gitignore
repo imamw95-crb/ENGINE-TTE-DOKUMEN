@@ -1,6 +1,9 @@
 # Dependency (dipulihkan dengan `composer install`)
 /vendor/
 
+# Konfigurasi lokal: alamat SIMRS, DSN, kredensial — jangan di-commit.
+/.env
+
 # Data runtime: database, kunci enkripsi, surat, template, output, tmp.
 # Dibuat otomatis saat aplikasi pertama kali dijalankan — jangan di-commit.
 /storage/

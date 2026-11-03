@@ -33,7 +33,8 @@ laporan alih-alih mengarang hasil.
 - **Jangan** `git add` `storage/` atau `vendor/`. `storage/` berisi `app.db`, `secret.key`
   (kunci AES-256 password SIMRS), surat, dan output PDF berisi data pasien.
 - **Jangan** menaruh kredensial, token, URL/akun SIMRS nyata, atau path absolut mesin pribadi
-  di kode yang di-commit. Repo ini publik.
+  di kode yang di-commit. Repo ini publik. Alamat SIMRS disimpan di `.env` (gitignored),
+  jangan dikembalikan ke `src/config.php`.
 - **Jangan** menghapus atau menimpa `storage/app.db`, `storage/surat/`, `storage/output/`
   tanpa perintah eksplisit dari user. Kalau perlu merapikan, pindahkan ke folder backup.
 - **Jangan** mengubah urutan bagian PDF, format nama berkas

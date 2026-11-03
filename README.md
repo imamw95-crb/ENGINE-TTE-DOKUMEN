@@ -159,7 +159,17 @@ Selain `storage/`, `vendor/` juga tidak di-commit. Aturan kerja untuk agent AI a
 | `TTE_DB_DSN` | `sqlite:<web>/storage/app.db` |
 | `TTE_STORAGE` | `<web>/storage` |
 | `TTE_OUTPUT` | `<web>/storage/output` |
-| `TTE_SIMRS_BASE` | `http://10.4.0.22/simrs` |
+| `TTE_SIMRS_BASE` | `http://10.x.x.x/simrs` (placeholder — isi lewat `.env`) |
+
+Alamat SIMRS **tidak** disimpan di repo. Isi di berkas `.env` (sudah masuk `.gitignore`),
+dipakai baik oleh `php -S ...` lokal maupun `docker compose`:
+
+```
+TTE_SIMRS_BASE=http://<ip-simrs>/simrs
+```
+
+Nilai `.env` hanya dipakai kalau environment variable bernama sama belum diset, jadi
+`TTE_SIMRS_BASE=... php -S ...` tetap menang.
 
 ## Sumber data SIMRS yang sudah dipetakan (SIMRS)
 
@@ -267,7 +277,8 @@ docker compose exec web ls -l storage/master   # cek master sudah lengkap
 ### Catatan
 
 - `TTE_SIMRS_BASE` bisa diganti tanpa mengubah kode: buat `.env` berisi
-  `TTE_SIMRS_BASE=http://10.4.0.22/simrs` (atau IP lain), lalu `docker compose up -d`.
+  `TTE_SIMRS_BASE=http://<ip-simrs>/simrs`, lalu `docker compose up -d`. Berkas `.env` juga dibaca
+  oleh aplikasi (lihat [Konfigurasi](#konfigurasi-environment)).
 - Upload dibatasi 64 MB (`docker/php.ini`), waktu eksekusi 600 detik untuk generate massal.
 - Semua isi `storage/` dimiliki `www-data`. Menyalin berkas master ke container yang **sudah
   berjalan** pakai `docker compose cp <berkas> web:/var/www/html/storage/master/` (SFTP ke folder
