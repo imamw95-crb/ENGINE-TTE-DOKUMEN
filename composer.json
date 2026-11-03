@@ -1,0 +1,9 @@
+{
+    "name": "rsmpp/tte-patrol-web",
+    "type": "project",
+    "require": {
+        "setasign/fpdi": "^2.6",
+        "setasign/tfpdf": "^1.34",
+        "maennchen/zipstream-php": "^3.2"
+    }
+}

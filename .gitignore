@@ -1,0 +1,6 @@
+# Dependency (dipulihkan dengan `composer install`)
+/vendor/
+
+# Data runtime: database, kunci enkripsi, surat, template, output, tmp.
+# Dibuat otomatis saat aplikasi pertama kali dijalankan — jangan di-commit.
+/storage/
