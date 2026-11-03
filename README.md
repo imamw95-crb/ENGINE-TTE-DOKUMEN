@@ -8,23 +8,91 @@ Nama & urutan output tetap sama dengan versi lama:
 
 ## Kebutuhan
 
-- PHP 8.1+ (`pdo_sqlite`, `curl`, `dom`, `mbstring`, `openssl`, `fileinfo`)
-- Composer (sudah terpasang: `setasign/fpdi`, `setasign/tfpdf`, `maennchen/zipstream-php`)
-- Python 3.10+ **hanya untuk dua skrip bantu**: `bin/siapkan_master.py` dan `bin/seed_step_data.py`
+- PHP 8.1+ dengan ekstensi `pdo_sqlite`, `curl`, `dom`, `mbstring`, `openssl`, `fileinfo`
+- Composer — library: `setasign/fpdi`, `setasign/tfpdf`, `maennchen/zipstream-php`
+- Python 3.10+ **hanya untuk skrip bantu**: `bin/siapkan_master.py`, `bin/seed_step_data.py`,
+  `bin/golden_test.py` — paketnya: `python -m pip install pymupdf openpyxl`
 
-## Instalasi
+## Baru clone repo ini? Baca ini dulu
+
+Repo ini **hanya berisi kode**. Dua hal sengaja tidak ikut di-commit (lihat `.gitignore`) dan
+harus disiapkan sendiri. Tanpa itu aplikasi tetap bisa dibuka (login, unggah surat, kelola
+template), tetapi **generate selalu gagal**.
+
+| Tidak ikut | Cara mendapatkannya |
+|---|---|
+| `vendor/` — library FPDI / tFPDF / ZipStream | `composer install` |
+| `storage/` — `app.db`, `secret.key`, master PDF, font, surat, template, output | dibuat otomatis; master LAMPIRAN 1 perlu `python bin\siapkan_master.py` |
+
+Gejala kalau `storage/master/` belum disiapkan — saat menekan **Generate**:
+
+```
+Posisi placeholder LAMPIRAN 1 belum tersedia. Jalankan bin/siapkan_master.py
+```
+
+`bin/siapkan_master.py` membaca dua PDF sumber dari folder kerja lama:
+
+```
+..\STEP 4 Dokumen Dengan No Form\Mater Lampiran.pdf
+..\STEP 6 Halaman Master Terakhir\Halaman Terakhir.pdf
+```
+
+**Opsi A — clone di dalam folder kerja (paling mudah).** Taruh repo sebagai
+`...\ttepatrol\web` dan pastikan `STEP 4 ...` serta `STEP 6 ...` ada di `...\ttepatrol\`.
+Kedua path itu ditemukan otomatis oleh script.
+
+**Opsi B — clone di tempat lain.** Unduh kedua PDF tersebut, lalu ubah konstanta
+`SUMBER_LAMPIRAN` dan `SUMBER_AKHIR` di bagian atas `bin\siapkan_master.py` ke lokasi berkasnya
+(script ini **tidak** membaca environment variable). Di Linux/macOS, ganti juga baris
+`shutil.copyfile(r"C:\Windows\Fonts\calibri.ttf", ...)` menjadi path Calibri/Carlito setempat.
+
+Tidak punya kedua PDF itu? LAMPIRAN 1 memang tidak bisa dibuat tanpa berkas sumbernya —
+lihat [Catatan penting: LAMPIRAN 1](#catatan-penting-lampiran-1).
+
+> **Agent AI / kontributor:** baca [AGENTS.md](AGENTS.md) sebelum mengubah kode. Isinya aturan
+> singkat: apa yang tidak boleh di-commit, cara verifikasi, dan jebakan PDF + encoding.
+
+## Mulai dari clone (langkah demi langkah)
 
 ```powershell
-cd C:\laragon\www\ttepatrol\web
+# 1. dependensi PHP
 composer install
 
-python bin\siapkan_master.py      # sekali: bersihkan master LAMPIRAN 1 + posisi teks
+# 2. dependensi Python (hanya untuk skrip bantu)
+python -m pip install pymupdf openpyxl
+
+# 3. master LAMPIRAN 1 + LAMPIRAN 2 + font Calibri (sekali saja; lihat "Baru clone" di atas)
+python bin\siapkan_master.py
+
+# 4. buat tabel database + akun admin
 php bin\init.php admin "GantiPassword!" admin
 
-# opsional: pindahkan data lama (STEP 1/4/5) ke database
+# 5. opsional: impor data lama dari folder STEP 1/4/5
 python bin\seed_step_data.py
 
-php -S 0.0.0.0:8081 -t public     # buka http://localhost:8081
+# 6. jalankan
+php -S 0.0.0.0:8081 -t public
+```
+
+Buka <http://localhost:8081>, lalu login dengan akun dari langkah 4.
+
+Langkah 4 sekaligus mencetak status master — pastikan keduanya `(ok)`:
+
+```
+Master LAMPIRAN 1: ...\storage\master\lampiran1_bersih.pdf (ok)
+Master LAMPIRAN 2: ...\storage\master\halaman_akhir.pdf (ok)
+```
+
+Kalau masih `(BELUM ADA)`, langkah 3 belum berhasil (umumnya PDF sumber tidak ditemukan).
+
+`storage/app.db` pada instalasi baru masih kosong: dokter, dokumen, dan template diisi lewat UI
+(unggah surat → dokumen & no. form → template) atau lewat langkah 5.
+
+Uji cepat setelah ada data:
+
+```powershell
+php bin\generate.php "dr. Putri Panji Lestari"
+python bin\golden_test.py
 ```
 
 ## Halaman
@@ -77,8 +145,11 @@ web/
 │   ├── siapkan_master.py     bersihkan master LAMPIRAN 1
 │   ├── seed_step_data.py     migrasi data STEP 1/4/5 ke database
 │   └── golden_test.py        bandingkan hasil PHP dengan output lama
-└── storage/                  app.db, master/, template/, surat/, output/, tmp/
+└── storage/                  runtime — TIDAK di-commit (lihat .gitignore)
 ```
+
+Selain `storage/`, `vendor/` juga tidak di-commit. Aturan kerja untuk agent AI ada di
+[AGENTS.md](AGENTS.md).
 
 ## Konfigurasi (environment)
 
