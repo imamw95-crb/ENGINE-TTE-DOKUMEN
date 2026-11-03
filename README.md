@@ -240,16 +240,23 @@ cd ~/ttepatrol-web
 mkdir -p storage/master storage/template storage/surat storage/output storage/tmp storage/fonts/unifont
 ```
 
-Empat berkas berikut **tidak ada di repo** dan harus disalin dari instalasi lokal (`web/storage/`):
+Berkas berikut **tidak ada di repo**. Master LAMPIRAN 1 & 2 sekarang bisa diunggah lewat
+menu **Master lampiran** setelah login; font tetap harus disalin dari instalasi lokal
+(`web/storage/`), atau dari `C:\Windows\Fonts\calibri.ttf`:
+
+```
+storage/fonts/unifont/calibri.ttf
+```
+
+Alternatif tanpa UI (menyalin master yang sudah ada):
 
 ```
 storage/master/lampiran1_bersih.pdf
 storage/master/lampiran1_posisi.json
 storage/master/halaman_akhir.pdf
-storage/fonts/unifont/calibri.ttf
 ```
 
-Kalau keempatnya belum ada, container tetap jalan tetapi generate akan gagal
+Kalau font/master belum ada, container tetap jalan tetapi generate akan gagal
 (lihat [Catatan penting: LAMPIRAN 1](#catatan-penting-lampiran-1)).
 
 ```bash
