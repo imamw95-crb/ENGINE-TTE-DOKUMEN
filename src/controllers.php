@@ -445,6 +445,13 @@ function ctrl_master_upload(): void
     redirect('master');
 }
 
+/* ============================== bantuan ============================== */
+
+function ctrl_tutorial(): void
+{
+    view('tutorial');
+}
+
 /* ============================== SIMRS ============================== */
 
 function ctrl_simrs(): void

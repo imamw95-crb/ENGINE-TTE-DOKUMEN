@@ -13,6 +13,9 @@ $menuAlat = [
     'simrs' => 'Ambil data dari SIMRS',
     'master' => 'Master lampiran',
 ];
+$menuBantuan = [
+    'tutorial' => 'Tutorial penggunaan',
+];
 
 $aktifKey = null;
 foreach (array_keys($langkahMenu) as $k) {
@@ -63,6 +66,15 @@ $adaSidebar = (bool) $user;
         $aktif = $ruteAktif === $r || str_starts_with($ruteAktif, $r . '.') ? 'aktif' : ''; ?>
       <a href="<?= e(url($r)) ?>" class="<?= $aktif ?>">
         <span class="nomor alat">•</span>
+        <span><span class="nama"><?= e($label) ?></span></span>
+      </a>
+    <?php endforeach; ?>
+
+    <div class="grup">Bantuan</div>
+    <?php foreach ($menuBantuan as $r => $label):
+        $aktif = $ruteAktif === $r ? 'aktif' : ''; ?>
+      <a href="<?= e(url($r)) ?>" class="<?= $aktif ?>">
+        <span class="nomor alat">?</span>
         <span><span class="nama"><?= e($label) ?></span></span>
       </a>
     <?php endforeach; ?>

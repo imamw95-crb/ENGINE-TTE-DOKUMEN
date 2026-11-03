@@ -50,6 +50,7 @@ $peta = [
     'template.hapus' => 'ctrl_template_hapus',
     'master' => 'ctrl_master',
     'master.upload' => 'ctrl_master_upload',
+    'tutorial' => 'ctrl_tutorial',
     'simrs' => 'ctrl_simrs',
     'simrs.akun' => 'ctrl_simrs_akun',
     'simrs.akun.hapus' => 'ctrl_simrs_akun_hapus',

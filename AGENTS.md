@@ -55,7 +55,7 @@ laporan alih-alih mengarang hasil.
 | `src/services/generate.php` | orkestrasi generate per dokter (pilih template, nama file, tulis `hasil_file`) |
 | `src/services/simrs.php` | login SIMRS, panggil endpoint DataTables, parsing & pemetaan baris |
 | `src/services/impor.php` | impor CSV dokumen |
-| `views/` | layout (`_header`/`_footer`) + halaman per langkah |
+| `views/` | layout (`_header`/`_footer`) + halaman per langkah (`tutorial` berisi panduan pemakaian) |
 | `Dockerfile`, `docker-compose.yml`, `docker/` | image PHP 8.3 + Apache; `docker/entrypoint.sh` menyiapkan folder `storage/` sebelum Apache jalan |
 | `bin/` | skrip CLI: `init.php`, `generate.php`, `impor_template.php`, `siapkan_master.py`, `seed_step_data.py`, `golden_test.py`, `uji_simrs.php` |
 

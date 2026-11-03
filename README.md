@@ -107,6 +107,7 @@ Menu disusun **step by step** di sidebar kiri:
 | 4 | **Generate & unduh** | Generate per dokter atau semua dokter (progress), unduh per file / ZIP dokter / ZIP batch. |
 | — | **Ambil data dari SIMRS** (Pengaturan) | Login SIMRS → uji endpoint → petakan kolom → *Ambil Data* (per dokter) → *Terapkan*. |
 | — | **Master lampiran** (Pengaturan) | Unggah **LAMPIRAN 1** (placeholder dibersihkan otomatis oleh `bin/siapkan_master.py`) dan **Halaman Terakhir / LAMPIRAN 2**. |
+| — | **Tutorial penggunaan** (Bantuan) | Panduan langkah 1–4, master lampiran, SIMRS, dan troubleshooting di dalam aplikasi. |
 
 Setiap halaman langkah menampilkan penanda **"Langkah N dari 4"** di atas judul.
 
