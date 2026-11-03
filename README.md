@@ -208,6 +208,66 @@ Pemeriksaan SIMRS tanpa browser:
 php bin\uji_simrs.php
 ```
 
+## Deploy dengan Docker
+
+Repo sudah menyertakan `Dockerfile`, `docker-compose.yml`, dan konfigurasi Apache/PHP di `docker/`.
+Image = PHP 8.3 + Apache (document root `public/`), `vendor/` di-install saat build, dan `storage/`
+di-mount dari host supaya database serta PDF hasil generate tetap ada ketika container dibuat ulang.
+
+### Deploy pertama
+
+```bash
+git clone https://github.com/imamw95-crb/ENGINE-TTE-DOKUMEN.git ~/ttepatrol-web
+cd ~/ttepatrol-web
+mkdir -p storage/master storage/template storage/surat storage/output storage/tmp storage/fonts/unifont
+```
+
+Empat berkas berikut **tidak ada di repo** dan harus disalin dari instalasi lokal (`web/storage/`):
+
+```
+storage/master/lampiran1_bersih.pdf
+storage/master/lampiran1_posisi.json
+storage/master/halaman_akhir.pdf
+storage/fonts/unifont/calibri.ttf
+```
+
+Kalau keempatnya belum ada, container tetap jalan tetapi generate akan gagal
+(lihat [Catatan penting: LAMPIRAN 1](#catatan-penting-lampiran-1)).
+
+```bash
+docker compose up -d --build
+docker compose exec web php bin/init.php admin 'PASSWORD_ANDA' admin
+```
+
+Buka `http://<ip-server>:8090` lalu login. Port host diatur pada `docker-compose.yml` (`"8090:80"`).
+
+### Update ke versi terbaru
+
+```bash
+cd ~/ttepatrol-web
+git pull
+docker compose up -d --build
+```
+
+### Perintah harian
+
+```bash
+docker compose ps                       # status + healthcheck
+docker compose logs -f --tail=100 web   # log Apache/PHP
+docker compose exec web php bin/generate.php "dr. Putri Panji Lestari"
+docker compose exec web ls -l storage/master   # cek master sudah lengkap
+```
+
+### Catatan
+
+- `TTE_SIMRS_BASE` bisa diganti tanpa mengubah kode: buat `.env` berisi
+  `TTE_SIMRS_BASE=http://10.4.0.22/simrs` (atau IP lain), lalu `docker compose up -d`.
+- Upload dibatasi 64 MB (`docker/php.ini`), waktu eksekusi 600 detik untuk generate massal.
+- Semua isi `storage/` milik container berjalan sebagai `www-data`; berkas yang disalin manual
+  cukup bisa dibaca (`644`).
+- Container tidak membawa data dokter/pasien apa pun: isi lewat UI atau
+  `php bin/generate.php` setelah data dimasukkan.
+
 ## Keamanan
 
 - Login lokal (role `admin` / `operator` / `viewer`), CSRF token di semua POST.

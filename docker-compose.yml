@@ -1,0 +1,21 @@
+services:
+  web:
+    build: .
+    image: tte-patrol-web:latest
+    container_name: tte-patrol-web
+    restart: unless-stopped
+    ports:
+      # host:container — ganti 8090 bila bentrok
+      - "8090:80"
+    volumes:
+      # database, master PDF, font, surat, template, dan output disimpan di host
+      - ./storage:/var/www/html/storage
+    environment:
+      TZ: Asia/Jakarta
+      TTE_SIMRS_BASE: ${TTE_SIMRS_BASE:-http://10.4.0.22/simrs}
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/index.php?r=login') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
