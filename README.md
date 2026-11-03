@@ -144,7 +144,8 @@ web/
 │   ├── generate.php          generate lewat CLI
 │   ├── siapkan_master.py     bersihkan master LAMPIRAN 1
 │   ├── seed_step_data.py     migrasi data STEP 1/4/5 ke database
-│   └── golden_test.py        bandingkan hasil PHP dengan output lama
+│   ├── golden_test.py        bandingkan hasil PHP dengan output lama
+│   └── impor_template.php   impor template PDF sekaligus dari folder
 └── storage/                  runtime — TIDAK di-commit (lihat .gitignore)
 ```
 
@@ -259,6 +260,7 @@ docker compose up -d --build
 docker compose ps                       # status + healthcheck
 docker compose logs -f --tail=100 web   # log Apache/PHP
 docker compose exec web php bin/generate.php "dr. Putri Panji Lestari"
+docker compose exec -T -u www-data web php bin/impor_template.php <folder-pdf> [form-master.json]
 docker compose exec web ls -l storage/master   # cek master sudah lengkap
 ```
 
@@ -272,6 +274,8 @@ docker compose exec web ls -l storage/master   # cek master sudah lengkap
   host akan ditolak karena permission), lalu `docker compose restart web`.
 - Container tidak membawa data dokter/pasien apa pun: isi lewat UI atau
   `php bin/generate.php` setelah data dimasukkan.
+- Untuk mengisi 29 template form sekaligus tanpa klik satu per satu:
+  `docker compose exec -T -u www-data web php bin/impor_template.php /path/folder /path/form_master.json`
 
 ## Keamanan
 
