@@ -5,17 +5,24 @@
 <?php if (boleh_tulis()): ?>
 <div class="baris" style="margin-bottom:16px">
   <div class="kartu" style="flex:2">
-    <h3 style="margin-top:0">LAMPIRAN 1 — dikelola lewat skrip</h3>
+    <h3 style="margin-top:0">Unggah LAMPIRAN 1</h3>
     <p class="sempit muted">
-      Halaman ini berisi placeholder teks yang harus <strong>benar-benar dihapus</strong>
-      (bukan ditutup kotak putih). FPDI/tFPDF di PHP tidak bisa menghapus teks, jadi
-      master LAMPIRAN 1 disiapkan sekali oleh <code>python web/bin/siapkan_master.py</code>
-      dan disimpan sebagai <code>storage/master/lampiran1_bersih.pdf</code>.
+      PDF <strong>1 halaman</strong> yang masih memuat teks placeholder
+      (<code>RSMPP26090009</code> dan <code>FN25010002 - ...</code>). Setelah diunggah,
+      teks placeholder dihapus otomatis oleh <code>bin/siapkan_master.py</code> (PyMuPDF)
+      dan posisi tulisnya dihitung ulang — PHP/FPDI tidak bisa menghapus teks.
+      PDF hasil scan tanpa lapisan teks akan ditolak.
     </p>
-    <p class="sempit muted">
-      Bila desain LAMPIRAN 1 berubah: ganti
-      <code>STEP 4 Dokumen Dengan No Form\Mater Lampiran.pdf</code>, lalu jalankan
-      <code>python web/bin/siapkan_master.py</code> lagi (posisi teks ikut dihitung ulang).
+    <form method="post" action="<?= e(url('master.upload')) ?>" enctype="multipart/form-data">
+      <input type="hidden" name="csrf" value="<?= e(csrf()) ?>">
+      <input type="hidden" name="jenis" value="lampiran1">
+      <input type="file" name="berkas" accept="application/pdf" required>
+      <div style="margin-top:10px"><button class="btn" type="submit">Unggah LAMPIRAN 1</button></div>
+    </form>
+    <p class="sempit muted" style="margin-top:10px">
+      Tanpa unggahan, master bawaan tetap dipakai:
+      <code>storage/master/lampiran1_bersih.pdf</code> (dibuat dengan
+      <code>python web/bin/siapkan_master.py</code>).
     </p>
   </div>
   <div class="kartu">

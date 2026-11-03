@@ -400,25 +400,46 @@ function ctrl_master_upload(): void
         redirect('master');
     }
 
-    if ($jenis === 'lampiran1') {
-        flash('LAMPIRAN 1 tidak bisa diunggah dari sini: PDF-nya harus dibersihkan dari teks placeholder '
-            . '(PHP tidak bisa menghapus teks di dalam PDF). Ganti berkas sumber lalu jalankan '
-            . 'python web/bin/siapkan_master.py.', 'error');
-        redirect('master');
-    }
-
+    $bersih = null;
     try {
-        $path = simpan_upload_pdf($_FILES['berkas'], cfg('master_dir'), basename((string) $_FILES['berkas']['name']));
-        $halaman = pdf_halaman($path);
-        if ($halaman <= 0) {
-            throw new RuntimeException('PDF tidak terbaca / 0 halaman.');
+        if ($jenis === 'lampiran1') {
+            $unggahan = simpan_upload_pdf(
+                $_FILES['berkas'],
+                cfg('master_dir') . DIRECTORY_SEPARATOR . 'unggahan',
+                basename((string) $_FILES['berkas']['name'])
+            );
+            try {
+                $bersih = cfg('master_dir') . DIRECTORY_SEPARATOR
+                    . 'lampiran1_' . date('YmdHis') . '_bersih.pdf';
+                $posisiFile = cfg('master_dir') . DIRECTORY_SEPARATOR . 'lampiran1_posisi.json';
+                siapkan_master_lampiran1($unggahan, $bersih, $posisiFile);
+            } finally {
+                @unlink($unggahan);
+            }
+            $path = $bersih;
+            $halaman = pdf_halaman($path);
+            if ($halaman !== 1) {
+                throw new RuntimeException("LAMPIRAN 1 harus 1 halaman (hasil {$halaman} halaman).");
+            }
+        } else {
+            $path = simpan_upload_pdf($_FILES['berkas'], cfg('master_dir'), basename((string) $_FILES['berkas']['name']));
+            $halaman = pdf_halaman($path);
+            if ($halaman <= 0) {
+                throw new RuntimeException('PDF tidak terbaca / 0 halaman.');
+            }
         }
+
         db()->prepare('UPDATE master_berkas SET aktif = 0 WHERE jenis = ?')->execute([$jenis]);
         db()->prepare('INSERT INTO master_berkas (jenis, filename, path, halaman, sha256, aktif)
                        VALUES (?, ?, ?, ?, ?, 1)')
             ->execute([$jenis, basename($path), $path, $halaman, sha256_file($path)]);
-        flash("Master {$jenis} diperbarui ({$halaman} halaman).", 'info');
+        flash($jenis === 'lampiran1'
+            ? "Master LAMPIRAN 1 diperbarui ({$halaman} halaman); posisi placeholder dihitung ulang."
+            : "Master {$jenis} diperbarui ({$halaman} halaman).", 'info');
     } catch (Throwable $ex) {
+        if ($bersih !== null && is_file($bersih)) {
+            @unlink($bersih);
+        }
         flash('Gagal: ' . $ex->getMessage(), 'error');
     }
     redirect('master');

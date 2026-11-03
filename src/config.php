@@ -46,6 +46,7 @@ return [
     'output_dir' => $env('TTE_OUTPUT', $root . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'output'),
     'tmp_dir' => $env('TTE_TMP', $root . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'tmp'),
     'font_dir' => $env('TTE_FONT_DIR', $root . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'fonts'),
+    'python_bin' => $env('TTE_PYTHON', 'python'),
     'db' => $env('TTE_DB_DSN', 'sqlite:' . $root . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'app.db'),
     'db_user' => $env('TTE_DB_USER', ''),
     'db_pass' => $env('TTE_DB_PASS', ''),

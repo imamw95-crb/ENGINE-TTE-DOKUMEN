@@ -22,7 +22,7 @@ template), tetapi **generate selalu gagal**.
 | Tidak ikut | Cara mendapatkannya |
 |---|---|
 | `vendor/` — library FPDI / tFPDF / ZipStream | `composer install` |
-| `storage/` — `app.db`, `secret.key`, master PDF, font, surat, template, output | dibuat otomatis; master LAMPIRAN 1 perlu `python bin\siapkan_master.py` |
+| `storage/` — `app.db`, `secret.key`, master PDF, font, surat, template, output | dibuat otomatis; master LAMPIRAN 1 diunggah lewat menu Master (atau `python bin\siapkan_master.py`) |
 
 Gejala kalau `storage/master/` belum disiapkan — saat menekan **Generate**:
 
@@ -106,21 +106,27 @@ Menu disusun **step by step** di sidebar kiri:
 | 3 | **Template form** | Unggah / unggah ulang template per form (versioning), aktifkan versi, hapus, lihat PDF. |
 | 4 | **Generate & unduh** | Generate per dokter atau semua dokter (progress), unduh per file / ZIP dokter / ZIP batch. |
 | — | **Ambil data dari SIMRS** (Pengaturan) | Login SIMRS → uji endpoint → petakan kolom → *Ambil Data* (per dokter) → *Terapkan*. |
-| — | **Master lampiran** (Pengaturan) | Unggah Halaman Terakhir (LAMPIRAN 2). **LAMPIRAN 1 dikelola skrip** (lihat di bawah). |
+| — | **Master lampiran** (Pengaturan) | Unggah **LAMPIRAN 1** (placeholder dibersihkan otomatis oleh `bin/siapkan_master.py`) dan **Halaman Terakhir / LAMPIRAN 2**. |
 
 Setiap halaman langkah menampilkan penanda **"Langkah N dari 4"** di atas judul.
 
 ## Catatan penting: LAMPIRAN 1
 
 PHP (FPDI/tFPDF) **tidak bisa menghapus teks** yang sudah ada di PDF. Karena itu
-`Mater Lampiran.pdf` dibersihkan sekali oleh `bin/siapkan_master.py` (memakai PyMuPDF)
-menjadi `storage/master/lampiran1_bersih.pdf`, dan posisi teksnya disimpan di
-`storage/master/lampiran1_posisi.json`. Aplikasi lalu hanya menempelkan nilai baru.
+placeholder di master LAMPIRAN 1 dibersihkan oleh `bin/siapkan_master.py` (PyMuPDF)
+menjadi PDF bersih + `storage/master/lampiran1_posisi.json`; aplikasi lalu hanya
+menempelkan nilai baru di posisi tersebut.
 
-Kalau desain LAMPIRAN 1 berubah:
-1. ganti `STEP 4 Dokumen Dengan No Form\Mater Lampiran.pdf`,
-2. jalankan `python bin/siapkan_master.py`,
-3. generate ulang.
+Dua cara mengganti master LAMPIRAN 1:
+
+1. **Unggah lewat menu Master lampiran** (disarankan). Unggah PDF 1 halaman yang masih
+   berisi placeholder `RSMPP26090009` dan `FN25010002 - ...`; aplikasi memanggil
+   `bin/siapkan_master.py` otomatis (butuh Python + `pymupdf`, atur `TTE_PYTHON` bila
+   `python` tidak ada di PATH), menyimpan PDF bersih sebagai versi baru, dan menghitung
+   ulang posisi placeholder. Berkas asli dihapus setelah diproses.
+2. **Manual lewat skrip**, mis. untuk desain baru di luar aplikasi: ganti
+   `STEP 4 Dokumen Dengan No Form\Mater Lampiran.pdf`, jalankan
+   `python bin/siapkan_master.py`, lalu generate ulang.
 
 ## Struktur
 
@@ -159,6 +165,7 @@ Selain `storage/`, `vendor/` juga tidak di-commit. Aturan kerja untuk agent AI a
 | `TTE_DB_DSN` | `sqlite:<web>/storage/app.db` |
 | `TTE_STORAGE` | `<web>/storage` |
 | `TTE_OUTPUT` | `<web>/storage/output` |
+| `TTE_PYTHON` | `python` (interpreter untuk `bin/siapkan_master.py` saat unggah LAMPIRAN 1) |
 | `TTE_SIMRS_BASE` | `http://10.x.x.x/simrs` (placeholder — isi lewat `.env`) |
 
 Alamat SIMRS **tidak** disimpan di repo. Isi di berkas `.env` (sudah masuk `.gitignore`),
@@ -285,6 +292,11 @@ docker compose exec web ls -l storage/master   # cek master sudah lengkap
   host akan ditolak karena permission), lalu `docker compose restart web`.
 - Container tidak membawa data dokter/pasien apa pun: isi lewat UI atau
   `php bin/generate.php` setelah data dimasukkan.
+- **Unggah LAMPIRAN 1 dari UI butuh Python + `pymupdf` di runtime** (untuk menjalankan
+  `bin/siapkan_master.py`). Image bawaan hanya PHP, jadi di Docker: siapkan master di host
+  (`python bin/siapkan_master.py`) lalu salin dengan `docker compose cp` di atas, atau
+  tambahkan Python ke image dan set `TTE_PYTHON`. Unggah Halaman Terakhir (LAMPIRAN 2)
+  tidak butuh Python.
 - Untuk mengisi 29 template form sekaligus tanpa klik satu per satu:
   `docker compose exec -T -u www-data web php bin/impor_template.php /path/folder /path/form_master.json`
 

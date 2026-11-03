@@ -118,8 +118,46 @@ function jumlah_halaman(string $path): int
     return 0;
 }
 
-/** Parse "<nomor> <nama>.pdf" menjadi [nomor, nama]. */
-function parse_nama_surat(string $namaFile): array
+/**
+ * Bersihkan teks placeholder PDF unggahan memakai bin/siapkan_master.py (PyMuPDF).
+ * Mengembalikan posisi placeholder; melempar RuntimeException kalau skrip gagal.
+ */
+function siapkan_master_lampiran1(string $sumber, string $keluaran, string $posisiFile): array
+{
+    $python = (string) cfg('python_bin', 'python');
+    $skrip = cfg('root') . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'siapkan_master.py';
+    if (!is_file($skrip)) {
+        throw new RuntimeException('Skrip bin/siapkan_master.py tidak ditemukan.');
+    }
+
+    $perintah = [$python, $skrip,
+        '--sumber', $sumber, '--keluaran', $keluaran, '--posisi', $posisiFile,
+        '--lewati-akhir', '--lewati-font'];
+    $pipa = [];
+    $proses = @proc_open($perintah, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipa, cfg('root'));
+    if (!is_resource($proses)) {
+        throw new RuntimeException('Python tidak bisa dijalankan. Set TTE_PYTHON ke path python.exe.');
+    }
+    $keluar = (string) stream_get_contents($pipa[1]);
+    $galat = (string) stream_get_contents($pipa[2]);
+    fclose($pipa[1]);
+    fclose($pipa[2]);
+    $kode = proc_close($proses);
+    if ($kode !== 0) {
+        $pesan = trim($galat !== '' ? $galat : $keluar);
+        throw new RuntimeException('Gagal menyiapkan master: ' . ($pesan !== '' ? $pesan : 'kode ' . $kode));
+    }
+
+    $posisi = is_file($posisiFile)
+        ? (json_decode((string) file_get_contents($posisiFile), true) ?: [])
+        : [];
+    if (empty($posisi['kode']) || empty($posisi['nama'])) {
+        throw new RuntimeException('Posisi placeholder tidak terbaca dari skrip.');
+    }
+    return $posisi;
+}
+
+/** Parse "<nomor> <nama>.pdf" menjadi [nomor, nama]. */function parse_nama_surat(string $namaFile): array
 {
     $stem = preg_replace('/\.pdf$/i', '', trim($namaFile)) ?? $namaFile;
     $stem = preg_replace('/\s+/u', ' ', $stem) ?? $stem;

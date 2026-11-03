@@ -61,10 +61,13 @@ laporan alih-alih mengarang hasil.
 
 ## Jebakan yang sering bikin salah
 
-- **FPDI/tFPDF tidak bisa menghapus teks.** Karena itu `Mater Lampiran.pdf` dibersihkan sekali
-  oleh `bin/siapkan_master.py` (PyMuPDF) menjadi `storage/master/lampiran1_bersih.pdf`, dan posisi
-  tulisnya disimpan di `storage/master/lampiran1_posisi.json`. PHP hanya menempelkan teks baru.
-  Tanpa JSON itu, `lampiran_buat()` melempar `RuntimeException`.
+- **FPDI/tFPDF tidak bisa menghapus teks.** Karena itu `Mater Lampiran.pdf` dibersihkan
+  oleh `bin/siapkan_master.py` (PyMuPDF) menjadi PDF bersih di `storage/master/`, dan posisi
+  tulisnya disimpan di `storage/master/lampiran1_posisi.json`. Unggah LAMPIRAN 1 dari menu
+  Master memanggil skrip itu otomatis (lewat `proc_open`, interpreter dari `TTE_PYTHON`);
+  bila Python/`pymupdf` tidak terpasang, unggahan LAMPIRAN 1 gagal dengan pesan jelas
+  (pakai jalur skrip manual). PHP hanya menempelkan teks baru. Tanpa JSON posisi,
+  `lampiran_buat()` melempar `RuntimeException`.
 - `define('FPDF_FONTPATH', ...)` harus dipanggil **sebelum** file FPDF dimuat
   (lihat `bin/generate.php` dan `bin/init.php`).
 - Font Calibri disalin dari `C:\Windows\Fonts\calibri.ttf` oleh `siapkan_master.py` — tidak
