@@ -53,6 +53,8 @@
   </p>
   <ul class="sempit" style="line-height:1.7">
     <li>Unggah ulang = versi baru; versi lama bisa diaktifkan kembali dari daftar.</li>
+    <li><strong>Edit</strong> (buka “edit nama / no form”) untuk memperbaiki no form atau nama form;
+      perubahan ikut diterapkan ke daftar dokumen dokter yang memakai form tersebut.</li>
     <li>Form tanpa template akan dilewati saat generate dan dilaporkan, bukan error.</li>
     <li>Template dipakai apa adanya (1–3 halaman), jadi pastikan hasil scan/export-nya rapi.</li>
   </ul>

@@ -326,6 +326,50 @@ function ctrl_template(): void
     view('template', ['forms' => $forms, 'versi' => $versi]);
 }
 
+function ctrl_template_simpan(): void
+{
+    wajib_tulis();
+    $id = (int) ($_POST['id'] ?? 0);
+    $noForm = trim((string) ($_POST['no_form'] ?? ''));
+    $namaForm = trim((string) ($_POST['nama_form'] ?? ''));
+    if ($id <= 0 || $noForm === '' || $namaForm === '') {
+        flash('No form dan nama form wajib diisi.', 'error');
+        redirect('template');
+    }
+
+    $stmt = db()->prepare('SELECT * FROM form_master WHERE id = ?');
+    $stmt->execute([$id]);
+    $form = $stmt->fetch();
+    if (!$form) {
+        flash('Master template tidak ditemukan.', 'error');
+        redirect('template');
+    }
+
+    $cek = db()->prepare('SELECT id FROM form_master WHERE no_form = ? AND id <> ?');
+    $cek->execute([$noForm, $id]);
+    if ($cek->fetchColumn() !== false) {
+        flash("No form {$noForm} sudah dipakai form lain.", 'error');
+        redirect('template');
+    }
+
+    try {
+        db()->beginTransaction();
+        db()->prepare('UPDATE form_master SET no_form = ?, nama_form = ? WHERE id = ?')
+            ->execute([$noForm, $namaForm, $id]);
+        // Dokumen dokter mencari template lewat no_form, jadi ikut diperbarui.
+        if ($noForm !== $form['no_form'] || $namaForm !== $form['nama_form']) {
+            db()->prepare('UPDATE dokumen SET no_form = ?, nama_form = ? WHERE no_form = ?')
+                ->execute([$noForm, $namaForm, $form['no_form']]);
+        }
+        db()->commit();
+        flash("Master template {$noForm} diperbarui.", 'info');
+    } catch (Throwable $ex) {
+        db()->rollBack();
+        flash('Gagal memperbarui: ' . $ex->getMessage(), 'error');
+    }
+    redirect('template');
+}
+
 function ctrl_template_upload(): void
 {
     wajib_tulis();

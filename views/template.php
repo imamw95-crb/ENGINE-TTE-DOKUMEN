@@ -1,6 +1,6 @@
 <?php $judul = 'Step 5 · Template'; require __DIR__ . '/_header.php'; ?>
 <h1>Step 5 — Master template</h1>
-<p class="sub">Satu template aktif per form. Unggah ulang untuk membuat versi baru; versi lama tetap tersimpan.</p>
+<p class="sub">Satu template aktif per form. Unggah ulang = versi baru (versi lama tetap tersimpan); nama &amp; no form bisa diperbaiki lewat tombol <strong>edit</strong>.</p>
 
 <div class="kartu padat">
   <table>
@@ -34,6 +34,18 @@
             <input type="file" name="berkas" accept="application/pdf" required style="width:210px;display:inline-block">
             <button class="btn kecil" type="submit"><?= $aktif ? 'Unggah ulang' : 'Unggah' ?></button>
           </form>
+          <details class="sempit" style="margin-top:6px;text-align:left">
+            <summary class="muted" style="cursor:pointer">edit nama / no form</summary>
+            <form method="post" action="<?= e(url('template.simpan')) ?>" style="margin-top:6px">
+              <input type="hidden" name="csrf" value="<?= e(csrf()) ?>">
+              <input type="hidden" name="id" value="<?= (int) $f['id'] ?>">
+              <input type="text" name="no_form" value="<?= e($f['no_form']) ?>" required
+                     aria-label="No form" style="max-width:150px;font-size:12.5px">
+              <input type="text" name="nama_form" value="<?= e($f['nama_form']) ?>" required
+                     aria-label="Nama form" style="margin-top:4px;font-size:12.5px">
+              <button class="btn kecil" type="submit" style="margin-top:4px">Simpan</button>
+            </form>
+          </details>
           <?php endif; ?>
         </td>
       </tr>
@@ -43,6 +55,7 @@
           Versi:
           <?php foreach ($daftar as $v): ?>
             <span class="pill">v<?= (int) $v['versi'] ?> · <?= (int) $v['halaman'] ?> hal<?= (int) $v['aktif'] === 1 ? ' · aktif' : '' ?></span>
+            <a class="pill" href="<?= e(url('unduh', ['jenis' => 'template', 'id' => $v['id']])) ?>" target="_blank">lihat</a>
             <?php if (boleh_tulis()): ?>
               <?php if ((int) $v['aktif'] !== 1): ?>
               <form method="post" action="<?= e(url('template.aktif')) ?>" class="inline">

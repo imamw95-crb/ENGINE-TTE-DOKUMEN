@@ -45,6 +45,7 @@ $peta = [
     'dokumen.hapus' => 'ctrl_dokumen_hapus',
     'dokumen.impor' => 'ctrl_dokumen_impor',
     'template' => 'ctrl_template',
+    'template.simpan' => 'ctrl_template_simpan',
     'template.upload' => 'ctrl_template_upload',
     'template.aktif' => 'ctrl_template_aktif',
     'template.hapus' => 'ctrl_template_hapus',
