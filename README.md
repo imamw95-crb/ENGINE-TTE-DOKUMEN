@@ -236,10 +236,14 @@ Kalau keempatnya belum ada, container tetap jalan tetapi generate akan gagal
 
 ```bash
 docker compose up -d --build
-docker compose exec web php bin/init.php admin 'PASSWORD_ANDA' admin
+docker compose exec -T -u www-data web php bin/init.php admin 'PASSWORD_ANDA' admin
 ```
 
 Buka `http://<ip-server>:8090` lalu login. Port host diatur pada `docker-compose.yml` (`"8090:80"`).
+
+> `-u www-data` **wajib**. Apache berjalan sebagai `www-data`; kalau perintah dijalankan tanpa
+> `-u` (jadi root), `storage/app.db` dimiliki root dan login gagal dengan
+> `SQLITE_READONLY: attempt to write a readonly database`.
 
 ### Update ke versi terbaru
 
@@ -263,8 +267,9 @@ docker compose exec web ls -l storage/master   # cek master sudah lengkap
 - `TTE_SIMRS_BASE` bisa diganti tanpa mengubah kode: buat `.env` berisi
   `TTE_SIMRS_BASE=http://10.4.0.22/simrs` (atau IP lain), lalu `docker compose up -d`.
 - Upload dibatasi 64 MB (`docker/php.ini`), waktu eksekusi 600 detik untuk generate massal.
-- Semua isi `storage/` milik container berjalan sebagai `www-data`; berkas yang disalin manual
-  cukup bisa dibaca (`644`).
+- Semua isi `storage/` dimiliki `www-data`. Menyalin berkas master ke container yang **sudah
+  berjalan** pakai `docker compose cp <berkas> web:/var/www/html/storage/master/` (SFTP ke folder
+  host akan ditolak karena permission), lalu `docker compose restart web`.
 - Container tidak membawa data dokter/pasien apa pun: isi lewat UI atau
   `php bin/generate.php` setelah data dimasukkan.
 

@@ -10,6 +10,9 @@ mkdir -p "$STORE" "$STORE/master" "$STORE/template" "$STORE/surat" \
 # (master PDF, font) cukup 644 sehingga tidak perlu di-chown.
 find "$STORE" -type d -exec chown www-data:www-data {} +
 find "$STORE" -type d -exec chmod 775 {} +
+# app.db dan berkas lain di akar storage bisa saja dibuat oleh root
+# (mis. `docker compose exec` tanpa -u), sehingga SQLite jadi read-only.
+find "$STORE" -maxdepth 1 -type f -exec chown www-data:www-data {} + -exec chmod 664 {} +
 
 if [ -z "$(ls -A "$STORE/master" 2>/dev/null)" ]; then
     echo "[tte-patrol] PERINGATAN: $STORE/master kosong." >&2
