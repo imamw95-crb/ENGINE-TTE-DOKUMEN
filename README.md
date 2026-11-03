@@ -292,11 +292,12 @@ docker compose exec web ls -l storage/master   # cek master sudah lengkap
   host akan ditolak karena permission), lalu `docker compose restart web`.
 - Container tidak membawa data dokter/pasien apa pun: isi lewat UI atau
   `php bin/generate.php` setelah data dimasukkan.
-- **Unggah LAMPIRAN 1 dari UI butuh Python + `pymupdf` di runtime** (untuk menjalankan
-  `bin/siapkan_master.py`). Image bawaan hanya PHP, jadi di Docker: siapkan master di host
-  (`python bin/siapkan_master.py`) lalu salin dengan `docker compose cp` di atas, atau
-  tambahkan Python ke image dan set `TTE_PYTHON`. Unggah Halaman Terakhir (LAMPIRAN 2)
-  tidak butuh Python.
+- **Unggah LAMPIRAN 1 dari UI butuh Python + `pymupdf`** (untuk menjalankan
+  `bin/siapkan_master.py`). Image bawaan sudah menyertakannya di venv `/opt/tte-py`
+  (env `TTE_PYTHON`), jadi fitur ini jalan di container dan ukuran image bertambah
+  ±80 MB. Kalau memakai image tanpa Python, siapkan master di host
+  (`python bin/siapkan_master.py`) lalu salin dengan `docker compose cp` di atas.
+  Unggah Halaman Terakhir (LAMPIRAN 2) tidak butuh Python.
 - Untuk mengisi 29 template form sekaligus tanpa klik satu per satu:
   `docker compose exec -T -u www-data web php bin/impor_template.php /path/folder /path/form_master.json`
 

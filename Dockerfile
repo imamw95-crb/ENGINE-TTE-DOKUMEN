@@ -14,8 +14,14 @@ FROM php:8.3-apache
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libonig-dev libxml2-dev libcurl4-openssl-dev libsqlite3-dev \
+        python3 python3-venv \
     && docker-php-ext-install pdo_sqlite mbstring dom curl \
+    && python3 -m venv /opt/tte-py \
+    && /opt/tte-py/bin/pip install --no-cache-dir "pymupdf>=1.24,<2" \
     && rm -rf /var/lib/apt/lists/*
+
+# Dipakai bin/siapkan_master.py saat unggah LAMPIRAN 1 dari UI (PyMuPDF).
+ENV TTE_PYTHON=/opt/tte-py/bin/python
 
 COPY docker/php.ini /usr/local/etc/php/conf.d/zz-tte-patrol.ini
 COPY docker/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
