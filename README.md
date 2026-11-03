@@ -102,7 +102,7 @@ Menu disusun **step by step** di sidebar kiri:
 | Langkah | Menu | Fungsi |
 |---|---|---|
 | 1 | **Unggah surat** | Unggah PDF surat (bisa banyak). Nomor + nama dokter dibaca dari nama file `<nomor> <nama>.pdf`, bisa dikoreksi. |
-| 2 | **Dokumen & No. Form** | Daftar dokter & dokumen (kode RSMPP + no form). Ada tombol **Ambil data dari SIMRS** (global) dan tombol **SIMRS** per dokter yang langsung membuka halaman SIMRS dengan dokter sudah terpilih. Isi manual / impor CSV tetap tersedia. |
+| 2 | **Dokumen & No. Form** | Daftar dokter & dokumen (kode RSMPP + no form); **Edit** per baris bisa mengganti no form, kode, dan nama form. Ada tombol **Ambil data dari SIMRS** (global) dan tombol **SIMRS** per dokter yang langsung membuka halaman SIMRS dengan dokter sudah terpilih. Isi manual / impor CSV tetap tersedia. |
 | 3 | **Template form** | Unggah / unggah ulang template per form (versioning), **edit no form & nama form** (ikut memperbarui dokumen dokter), aktifkan versi, hapus, lihat PDF. |
 | 4 | **Generate & unduh** | Generate per dokter atau semua dokter (progress), unduh per file / ZIP dokter / ZIP batch. |
 | — | **Ambil data dari SIMRS** (Pengaturan) | Login SIMRS → uji endpoint → petakan kolom → *Ambil Data* (per dokter) → *Terapkan*. |

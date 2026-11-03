@@ -248,12 +248,28 @@ function ctrl_dokumen_simpan(): void
 {
     wajib_tulis();
     $dokterId = (int) ($_POST['dokter_id'] ?? 0);
+    $id = (int) ($_POST['id'] ?? 0);
     $noForm = trim((string) ($_POST['no_form'] ?? ''));
     $kode = trim((string) ($_POST['kode_rsmpp'] ?? ''));
     $nama = trim((string) ($_POST['nama_form'] ?? ''));
     if ($dokterId <= 0 || $noForm === '') {
         flash('Dokter dan No Form wajib diisi.', 'error');
         redirect('dokter.detail', ['id' => $dokterId]);
+    }
+
+    if ($id > 0) {
+        $cek = db()->prepare('SELECT id FROM dokumen WHERE id = ? AND dokter_id = ?');
+        $cek->execute([$id, $dokterId]);
+        if ($cek->fetchColumn() === false) {
+            flash('Dokumen yang mau diedit tidak ditemukan.', 'error');
+            redirect('dokter.detail', ['id' => $dokterId]);
+        }
+        $bentrok = db()->prepare('SELECT id FROM dokumen WHERE dokter_id = ? AND no_form = ? AND id <> ?');
+        $bentrok->execute([$dokterId, $noForm, $id]);
+        if ($bentrok->fetchColumn() !== false) {
+            flash("No form {$noForm} sudah dipakai dokumen lain untuk dokter ini.", 'error');
+            redirect('dokter.detail', ['id' => $dokterId]);
+        }
     }
 
     $stmt = db()->prepare('SELECT id FROM form_master WHERE no_form = ?');
@@ -264,15 +280,21 @@ function ctrl_dokumen_simpan(): void
         db()->prepare('UPDATE form_master SET nama_form = ? WHERE no_form = ?')->execute([$nama, $noForm]);
     }
 
-    db()->prepare("INSERT INTO dokumen (dokter_id, no_form, kode_rsmpp, nama_form, sumber)
-                   VALUES (?, ?, ?, ?, 'manual')
-                   ON CONFLICT(dokter_id, no_form) DO UPDATE SET
-                     kode_rsmpp = excluded.kode_rsmpp,
-                     nama_form = excluded.nama_form,
-                     updated_at = CURRENT_TIMESTAMP")
-        ->execute([$dokterId, $noForm, $kode, $nama]);
-
-    flash("Dokumen {$noForm} disimpan.", 'info');
+    if ($id > 0) {
+        db()->prepare('UPDATE dokumen SET no_form = ?, kode_rsmpp = ?, nama_form = ?, updated_at = CURRENT_TIMESTAMP
+                       WHERE id = ?')
+            ->execute([$noForm, $kode, $nama, $id]);
+        flash("Dokumen {$noForm} diperbarui.", 'info');
+    } else {
+        db()->prepare("INSERT INTO dokumen (dokter_id, no_form, kode_rsmpp, nama_form, sumber)
+                       VALUES (?, ?, ?, ?, 'manual')
+                       ON CONFLICT(dokter_id, no_form) DO UPDATE SET
+                         kode_rsmpp = excluded.kode_rsmpp,
+                         nama_form = excluded.nama_form,
+                         updated_at = CURRENT_TIMESTAMP")
+            ->execute([$dokterId, $noForm, $kode, $nama]);
+        flash("Dokumen {$noForm} disimpan.", 'info');
+    }
     redirect('dokter.detail', ['id' => $dokterId]);
 }
 

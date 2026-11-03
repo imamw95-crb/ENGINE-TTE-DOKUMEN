@@ -38,6 +38,8 @@
   </p>
   <ul class="sempit" style="line-height:1.7">
     <li>Isi manual, impor CSV, atau ambil dari SIMRS (lihat bagian <a href="#simrs">Ambil data dari SIMRS</a>).</li>
+    <li>Tombol <strong>Edit</strong> pada tiap baris mengisi form di atas — no form, kode RSMPP, dan nama form
+      bisa diperbaiki, termasuk mengganti no form dokumen tersebut.</li>
     <li>Status <span class="badge tunggu">tunggu template</span> berarti belum ada template untuk form itu —
       dokumen tetap tersimpan, tapi dilewati saat generate.</li>
     <li>Kode RSMPP jangan disamakan antar dokter; ambil dari data masing-masing.</li>

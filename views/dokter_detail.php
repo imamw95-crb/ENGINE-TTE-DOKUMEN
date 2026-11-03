@@ -41,15 +41,19 @@ async function generateSatu(tombol, dokterId) {
 
 <?php if (boleh_tulis()): ?>
 <div class="kartu" style="margin-bottom:16px">
-  <h3 style="margin-top:0">Tambah / perbarui dokumen</h3>
-  <form method="post" action="<?= e(url('dokumen.simpan')) ?>">
+  <h3 style="margin-top:0" id="judul-dokumen">Tambah / perbarui dokumen</h3>
+  <form method="post" action="<?= e(url('dokumen.simpan')) ?>" id="form-dokumen">
     <input type="hidden" name="csrf" value="<?= e(csrf()) ?>">
     <input type="hidden" name="dokter_id" value="<?= (int) $dokter['id'] ?>">
+    <input type="hidden" name="id" id="dokumen_id" value="">
     <div class="baris">
       <div><label for="no_form">No Form</label><input type="text" id="no_form" name="no_form" placeholder="FN24120001" required></div>
       <div><label for="kode">Kode RSMPP</label><input type="text" id="kode" name="kode_rsmpp" placeholder="RSMPP26090001"></div>
       <div style="flex:2"><label for="nama_form">Nama form</label><input type="text" id="nama_form" name="nama_form" placeholder="KLINIK ONKOLOGI RADIASI ..."></div>
-      <div style="flex:0"><button class="btn" type="submit">Simpan</button></div>
+      <div style="flex:0">
+        <button class="btn" type="submit" id="simpan-dokumen">Simpan</button>
+        <button class="btn abu" type="button" id="batal-dokumen" onclick="batalEditDokumen()" style="display:none;margin-left:6px">Batal</button>
+      </div>
     </div>
   </form>
 
@@ -99,6 +103,12 @@ async function generateSatu(tombol, dokterId) {
         </td>
         <td class="kanan">
           <?php if (boleh_tulis()): ?>
+          <button class="btn kecil abu" type="button"
+                  data-id="<?= (int) $d['id'] ?>"
+                  data-no-form="<?= e($d['no_form']) ?>"
+                  data-kode="<?= e($d['kode_rsmpp']) ?>"
+                  data-nama="<?= e($d['nama_form']) ?>"
+                  onclick="editDokumen(this)">Edit</button>
           <form method="post" action="<?= e(url('dokumen.hapus')) ?>" class="inline" onsubmit="return confirm('Hapus dokumen ini?')">
             <input type="hidden" name="csrf" value="<?= e(csrf()) ?>">
             <input type="hidden" name="dokter_id" value="<?= (int) $dokter['id'] ?>">
@@ -131,4 +141,28 @@ async function generateSatu(tombol, dokterId) {
     </tbody>
   </table>
 </div>
+<?php if (boleh_tulis()): ?>
+<script>
+function editDokumen(btn) {
+  const d = btn.dataset;
+  document.getElementById('dokumen_id').value = d.id;
+  document.getElementById('no_form').value = d.noForm;
+  document.getElementById('kode').value = d.kode;
+  document.getElementById('nama_form').value = d.nama;
+  document.getElementById('judul-dokumen').textContent = 'Edit dokumen ' + d.noForm;
+  document.getElementById('simpan-dokumen').textContent = 'Simpan perubahan';
+  document.getElementById('batal-dokumen').style.display = '';
+  document.getElementById('form-dokumen').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('no_form').focus();
+}
+
+function batalEditDokumen() {
+  document.getElementById('form-dokumen').reset();
+  document.getElementById('dokumen_id').value = '';
+  document.getElementById('judul-dokumen').textContent = 'Tambah / perbarui dokumen';
+  document.getElementById('simpan-dokumen').textContent = 'Simpan';
+  document.getElementById('batal-dokumen').style.display = 'none';
+}
+</script>
+<?php endif; ?>
 <?php require __DIR__ . '/_footer.php'; ?>
